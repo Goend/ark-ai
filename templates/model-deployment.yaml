@@ -22,6 +22,7 @@ spec:
         model: {{ .Values.modelConfig.current.name }}
         size: {{ .Values.modelConfig.current.size }}
     spec:
+      runtimeClassName: nvidia
       containers:
       - name: {{ .Values.modelConfig.current.serviceType }}
         image: {{ template "model.image.fullName" . }}
