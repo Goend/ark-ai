@@ -1,0 +1,57 @@
+{{- if or (and .Values.baseConfig.ollama.enabled (eq .Values.modelConfig.current.serviceType "ollama")) (and .Values.baseConfig.vllm.enabled (eq .Values.modelConfig.current.serviceType "vllm")) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.modelConfig.current.serviceType }}
+  labels:
+    app: {{ .Values.modelConfig.current.serviceType }}
+    model: {{ .Values.modelConfig.current.name }}
+    size: {{ .Values.modelConfig.current.size }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.modelConfig.current.serviceType }}
+      model: {{ .Values.modelConfig.current.name }}
+      size: {{ .Values.modelConfig.current.size }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.modelConfig.current.serviceType }}
+        model: {{ .Values.modelConfig.current.name }}
+        size: {{ .Values.modelConfig.current.size }}
+    spec:
+      containers:
+      - name: {{ .Values.modelConfig.current.serviceType }}
+        image: {{ template "model.image.fullName" . }}
+        ports:
+        - containerPort: {{ if eq .Values.modelConfig.current.serviceType "ollama" }}{{ .Values.baseConfig.ollama.containerPort }}{{ else }}{{ .Values.baseConfig.vllm.containerPort }}{{ end }}
+        resources:
+          {{- toYaml .Values.modelConfig.current.resources | nindent 12 }}
+        env:
+        {{- if eq .Values.modelConfig.current.serviceType "ollama" }}
+        - name: OLLAMA_HOST
+          value: "0.0.0.0"
+        - name: OLLAMA_PORT
+          value: "{{ .Values.baseConfig.ollama.containerPort }}"
+        {{- else }}
+        - name: PORT
+          value: "{{ .Values.baseConfig.vllm.containerPort }}"
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.modelConfig.current.serviceType }}
+spec:
+  type: {{ template "model.service.type" . }}
+  ports:
+  - port: {{ .Values.modelConfig.current.servicePort }}
+    targetPort: {{ if eq .Values.modelConfig.current.serviceType "ollama" }}{{ .Values.baseConfig.ollama.containerPort }}{{ else }}{{ .Values.baseConfig.vllm.containerPort }}{{ end }}
+  selector:
+    app: {{ .Values.modelConfig.current.serviceType }}
+    model: {{ .Values.modelConfig.current.name }}
+    size: {{ .Values.modelConfig.current.size }}
+    release: {{ .Release.Name }}
+{{- end }} 

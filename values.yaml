@@ -1,0 +1,35 @@
+# 基础配置
+baseConfig:
+  ollama:
+    enabled: true
+    containerPort: 11434    # Ollama 容器端口
+    image:
+      repository: hub.ecns.io/ai    # 基础镜像仓库地址
+    service:
+      type: ClusterIP
+  vllm:
+    enabled: true
+    containerPort: 8000     # vLLM 容器端口
+    image:
+      repository: hub.ecns.io/ai    # 基础镜像仓库地址
+    service:
+      type: ClusterIP
+    
+
+# 模型配置
+modelConfig:
+  # 当前部署的模型配置
+  current:
+    name: "deepseek"    # 模型名称
+    size: "7b"          # 模型大小
+    serviceType: "ollama"     # 推理服务类型：ollama/vllm
+    servicePort: 11435        # 服务端口（Service 端口）
+    resources:
+      requests:
+        cpu: "4"
+        memory: "16Gi"
+        nvidia.com/gpu: "1"
+      limits:
+        cpu: "8"
+        memory: "32Gi"
+        nvidia.com/gpu: "1"
