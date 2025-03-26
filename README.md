@@ -8,6 +8,7 @@
 - Helm 3.0+
 - NVIDIA GPU 驱动和 CUDA
 - 配置好的 `nvidia` RuntimeClass
+- Nginx Ingress Controller（如果使用 Ingress）
 
 ## 安装
 
@@ -48,7 +49,7 @@ baseConfig:
 ```yaml
 modelConfig:
   current:
-    name: "deepseek"    # 模型名称
+    name: "qwen2.5"    # 模型名称
     size: "7b"          # 模型大小
     serviceType: "ollama"     # 推理服务类型：ollama/vllm
     servicePort: 11435        # 服务端口（Service 端口）
@@ -65,24 +66,52 @@ modelConfig:
 
 ## 使用
 
-### Ollama API
+### 通过 Ingress 访问
+
+当启用 Ingress 后，可以通过以下域名访问服务：
+
+#### Ollama API 端点
+- 生成文本：`https://ai.<release_name>.io/ollama/api/generate`
+
+示例请求：
+```bash
+curl https://ai.<release_name>.io/ollama/api/generate -d '{
+  "model": "qwen2.5",
+  "prompt": "Hello, how are you?"
+}'
+```
+
+#### vLLM API 端点
+- 聊天补全：`https://ai.<release_name>.io/vllm/v1/chat/completions`
+
+示例请求：
+```bash
+curl https://ai.<release_name>.io/vllm/v1/chat/completions -H "Content-Type: application/json" -d '{
+  "messages": [{"role": "user", "content": "Hello, how are you?"}],
+  "max_tokens": 100
+}'
+```
+
+### 直接访问 Service
+
+#### Ollama API
 
 当 `serviceType: "ollama"` 时，可以使用以下命令访问：
 
 ```bash
 curl http://model-deployment-ollama:11435/api/generate -d '{
-  "model": "deepseek",
+  "model": "qwen2.5",
   "prompt": "Hello, how are you?"
 }'
 ```
 
-### vLLM API
+#### vLLM API
 
 当 `serviceType: "vllm"` 时，可以使用以下命令访问：
 
 ```bash
-curl http://model-deployment-vllm:11435/v1/completions -H "Content-Type: application/json" -d '{
-  "prompt": "Hello, how are you?",
+curl http://model-deployment-vllm:11435/v1/chat/completions -H "Content-Type: application/json" -d '{
+  "messages": [{"role": "user", "content": "Hello, how are you?"}],
   "max_tokens": 100
 }'
 ```

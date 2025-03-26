@@ -20,7 +20,7 @@ baseConfig:
 modelConfig:
   # 当前部署的模型配置
   current:
-    name: "deepseek"    # 模型名称
+    name: "qwen2.5"    # 模型名称
     size: "7b"          # 模型大小
     serviceType: "ollama"     # 推理服务类型：ollama/vllm
     servicePort: 11435        # 服务端口（Service 端口）

@@ -56,3 +56,32 @@ spec:
     size: {{ .Values.modelConfig.current.size }}
     release: {{ .Release.Name }}
 {{- end }} 
+---
+# ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+spec:
+  rules:
+    - host: ai.{{ .Release.Name }}.io
+      http:
+        paths:
+          {{- if eq .Values.modelConfig.current.serviceType "ollama" }}
+          - path: /ollama/api/generate
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-{{ .Values.modelConfig.current.serviceType }}
+                port:
+                  number: {{ .Values.modelConfig.current.servicePort }}
+          {{- end }}
+          {{- if eq .Values.modelConfig.current.serviceType "vllm" }}
+          - path: /vllm/v1/chat/completions   
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-{{ .Values.modelConfig.current.serviceType }}
+                port:
+                  number: {{ .Values.modelConfig.current.servicePort }}
+          {{- end }}
