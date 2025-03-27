@@ -15,12 +15,14 @@ spec:
       app: {{ .Values.modelConfig.current.serviceType }}
       model: {{ .Values.modelConfig.current.name }}
       size: {{ .Values.modelConfig.current.size }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: {{ .Values.modelConfig.current.serviceType }}
         model: {{ .Values.modelConfig.current.name }}
         size: {{ .Values.modelConfig.current.size }}
+        release: {{ .Release.Name }}
     spec:
       runtimeClassName: nvidia
       containers:
@@ -68,7 +70,7 @@ spec:
       http:
         paths:
           {{- if eq .Values.modelConfig.current.serviceType "ollama" }}
-          - path: /ollama/api/generate
+          - path: /api/generate
             pathType: Prefix
             backend:
               service:

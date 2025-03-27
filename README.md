@@ -71,12 +71,12 @@ modelConfig:
 当启用 Ingress 后，可以通过以下域名访问服务：
 
 #### Ollama API 端点
-- 生成文本：`https://ai.<release_name>.io/ollama/api/generate`
+- 生成文本：`https://ai.<release_name>.io/api/generate`
 
 示例请求：
 ```bash
-curl https://ai.<release_name>.io/ollama/api/generate -d '{
-  "model": "qwen2.5",
+curl https://ai.<release_name>.io/api/generate -d '{
+  "model": "qwen2.5:<model size>",
   "prompt": "Hello, how are you?"
 }'
 ```
@@ -99,8 +99,8 @@ curl https://ai.<release_name>.io/vllm/v1/chat/completions -H "Content-Type: app
 当 `serviceType: "ollama"` 时，可以使用以下命令访问：
 
 ```bash
-curl http://model-deployment-ollama:11435/api/generate -d '{
-  "model": "qwen2.5",
+curl http://<ollama svc ip>:11435/api/generate -d '{
+  "model": "qwen2.5:<model size>",
   "prompt": "Hello, how are you?"
 }'
 ```
